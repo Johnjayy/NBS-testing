@@ -1,0 +1,32 @@
+name: CSWeb to ArcGIS Online Sync
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # Every 10 minutes
+  workflow_dispatch:         # Allow manual trigger from GitHub UI
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run sync
+        env:
+          CSWEB_BASE_URL: ${{ secrets.CSWEB_BASE_URL }}
+          CSWEB_USER: ${{ secrets.CSWEB_USER }}
+          CSWEB_PASS: ${{ secrets.CSWEB_PASS }}
+          AGOL_USER: ${{ secrets.AGOL_USER }}
+          AGOL_PASS: ${{ secrets.AGOL_PASS }}
+          AGOL_FEATURE_LAYER_URL: ${{ secrets.AGOL_FEATURE_LAYER_URL }}
+        run: python sync.py
